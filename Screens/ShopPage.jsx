@@ -2,22 +2,38 @@ import { SafeAreaView, Text, View, Image, Pressable, TouchableOpacity, ScrollVie
 import React, { useEffect, useState} from 'react'
 import Animated,{ZoomOutEasyDown, ZoomInEasyDown, FadeInUp, FadeOutDown} from 'react-native-reanimated';
 import Product from '../Componets/ShopScreen/Product';
-
-
+import  {fetchProducts} from '../MyCodes/ed5'
 import mocProducts from '../BackenData/Products'
 
 
 
 export default function ShopPage({ navigation }) {
-
+  const [productsFromDataBase, setProductsFromDataBase] = useState()
+  const [productsFormated, setProductsFormated] = useState([])
   const navigate = (to,params) =>{navigation.navigate(to,params)}
   const toItemPage = (name,price,img,desc) => {navigate('ProductPage',{name:name,price:price,img:img,desc:desc})}
+  if (productsFromDataBase) console.log(Object.keys(productsFromDataBase).length)
+  function convertProductToArray(){
+    let temp = []
+    if(productsFromDataBase)  Object.values(productsFromDataBase).forEach((key)=>{
+      
+      temp = [...temp, key]
 
+    })
+   if (Object.keys(productsFromDataBase).length != productsFormated.length ) {setProductsFormated(temp) }
+  }
+  
+
+  
+  if (productsFromDataBase) convertProductToArray()
+  //
+
+  useEffect(()=>{fetchProducts(setProductsFromDataBase); },[])
   //create shop items
-  const productMap = mocProducts.map(({ name, price, uri, desc})=>{
+  const productMap = productsFormated.map(({ name, price, img, desc})=>{
     return(
-      <TouchableOpacity onPress={()=>{toItemPage(name,price,uri,desc)}} className={` m-auto my-8 focus:opacity-20`} key={name}>
-        <Product name={name} price={price} uri={uri}/>
+      <TouchableOpacity onPress={()=>{toItemPage(name,price,img,desc)}} className={` m-auto my-8 focus:opacity-20`} key={`${name + 'bfnm'}`}>
+        <Product name={name} price={price} img={img} key={`${name + 'esgrd'}`}/>
       </TouchableOpacity>
     )
   })
