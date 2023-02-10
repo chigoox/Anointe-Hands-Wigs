@@ -11,11 +11,10 @@ import {WelcomePage, AboutPage, ShopPage, CartPage, AppointmentPage, ProductPage
 
 
 
-
 const Tab = createBottomTabNavigator();
 function HomeScreen(){
 return(
-    <Tab.Navigator screenOptions={{ headerShown: false }} initialRouteName="About" tabBar={props => <MyTabBar {...props} />}>
+    <Tab.Navigator screenOptions={{ headerShown: false }} initialRouteName="Cart" tabBar={props => <MyTabBar {...props} />}>
       <Tab.Screen name="Shop" component={ShopPage} />
       <Tab.Screen name="Cart" component={CartPage} />
       <Tab.Screen name="Appointment" component={AppointmentPage} />

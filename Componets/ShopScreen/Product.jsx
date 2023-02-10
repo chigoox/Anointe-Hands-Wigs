@@ -1,10 +1,10 @@
 import { View, Text, Image } from 'react-native'
 import React from 'react'
 
-function Product({ uri, name, price }) {
+function Product({ img, name, price }) {
   return (
     <View className={'bg-slate-400 h-72 w-44 rounded-3xl'}>
-              <Image className={'h-full w-full rounded-3xl'} source={{uri: uri}}></Image>  
+              <Image className={'h-full w-full rounded-3xl'} source={{uri: img}}></Image>  
               
               <View className={' h-full w-full'}>
                <Text className={'text-2xl font-bold text-slate-900 text-center'}>{name}</Text>

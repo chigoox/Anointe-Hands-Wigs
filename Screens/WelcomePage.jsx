@@ -21,7 +21,7 @@ export default function WelcomePage({ navigation }) {
     <Animated.View entering={ZoomInEasyDown} exiting={FadeInUp} className='relative h-full bg-slate-900 '> 
         <SafeAreaView className={'z-10'}>
           {/* Componets */}
-          {showSignUp && <SignUpScreen toggleSignUp={toggleSignUp} navigation={navigate('HomeScreen')}/>}
+          {showSignUp && <SignUpScreen toggleSignUp={toggleSignUp} navigation={()=>{navigate('HomeScreen')}}/>}
           {showLogin && <LoginScreen toggleLogin={toggleLogin} navigation={()=>{navigate('HomeScreen')}}/>}
           
 

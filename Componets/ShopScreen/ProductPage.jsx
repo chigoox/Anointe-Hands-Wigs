@@ -1,11 +1,51 @@
 import { SafeAreaView, Text, View, Image, Pressable, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useEffect, useState} from 'react'
-import Animated,{ZoomOutEasyDown, ZoomInEasyDown, FadeInUp, FadeOutDown} from 'react-native-reanimated';
+import Animated,{ FadeInUp, FadeOutDown} from 'react-native-reanimated';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { addUserInfoToDatabase, getSignedInUser, deleteUserData, decreaseCartAmount } from '../../MyCodes/ed5';
+import { increment } from "firebase/firestore";
+
 
 function ProductPage ({ navigation, route }) {
+    const [signedInUser, setSignedInUser] = useState()
+    const [userData, setUserData] = useState()
     const {name, price, img, desc} = route.params
-  return (
+    const [inCart,setInCart] = useState(false)
+    const toCart = {Cart:{[name]:{name:name? name:'', price: price? price:'', img:img? img:'', desc:desc? desc: ''}}, CartPrices: price? increment(price):increment(0) }
+    const [addedToCart, setAddedToCart] = useState(inCart)
+    checkIfItemInCart()
+    function checkIfItemInCart(){
+        if (userData?.Cart) Object.keys(userData.Cart)
+        .forEach((item)=>{
+            
+            if (item == name){
+               if (inCart == false){ 
+                setInCart(true)
+                setAddedToCart(true)
+            } 
+                return 
+            } 
+        })
+    }
+
+
+    function addToCart(){
+        addedToCart ? (
+            deleteUserData(signedInUser, name),
+            decreaseCartAmount(signedInUser, price)
+        ) :
+        ( addUserInfoToDatabase(toCart , signedInUser))
+        setAddedToCart(!addedToCart)
+    }  
+  
+ 
+
+  useEffect(()=>{
+    getSignedInUser(setSignedInUser, setUserData)
+    checkIfItemInCart()
+    },[addedToCart])
+  
+    return (
     <Animated.View nestedScrollEnabled = {true} className={'flex-1 h-screen  w-screen bg-slate-50'} entering={FadeInUp} exiting={FadeOutDown}  contentInsetAdjustmentBehavior="automatic">
         <SafeAreaView className={'flex flex-1 h-full'}>
             {/* Nav bar */}
@@ -37,7 +77,7 @@ function ProductPage ({ navigation, route }) {
                     <TouchableOpacity className={'bg-rose-400 h-22 w-[60%] rounded-full p-4'}>
                         <Text className={'font-bold text-5xl m-auto text-white'}>Buy Now</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity className={'bg-slate-300 h-20 w-20 rounded-full p-2'}>
+                    <TouchableOpacity onPress={addToCart} className={`${addedToCart? 'bg-rose-900':'bg-slate-300'} h-20 w-20 rounded-full p-2 transition-colors`}>
                         <Ionicons name={'cart'} size={64} color={'white'} />
                     </TouchableOpacity>
                 </View>

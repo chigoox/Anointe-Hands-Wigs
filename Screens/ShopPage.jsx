@@ -12,7 +12,6 @@ export default function ShopPage({ navigation }) {
   const [productsFormated, setProductsFormated] = useState([])
   const navigate = (to,params) =>{navigation.navigate(to,params)}
   const toItemPage = (name,price,img,desc) => {navigate('ProductPage',{name:name,price:price,img:img,desc:desc})}
-  if (productsFromDataBase) console.log(Object.keys(productsFromDataBase).length)
   function convertProductToArray(){
     let temp = []
     if(productsFromDataBase)  Object.values(productsFromDataBase).forEach((key)=>{
