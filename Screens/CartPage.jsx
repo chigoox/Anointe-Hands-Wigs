@@ -3,23 +3,57 @@ import React, { useEffect, useState} from 'react'
 import Animated,{ZoomOutEasyDown, ZoomInEasyDown, FadeInUp, FadeOutDown} from 'react-native-reanimated';
 import CartItem from '../Componets/CartScreen/CartItem';
 import mocCart from '../BackenData/Carts';
-import { CARTTOTAL } from '../BackenData/Carts';
+import { getSignedInUser, deleteUserData } from '../MyCodes/ed5'
+import { useIsFocused } from '@react-navigation/native'
+
+
+
 
 export default function CartPage() {
-  let [CARTTOTALg,setCARTTOTAL] = useState(0);
-  const cartMap = mocCart.cartItems.map(({name, price, img}) =>{
+  const [signedInUser, setSignedInUser] = useState()
+  const [userData, setUserData] = useState()
+  const deleteCartItem = (name) => {deleteUserData(signedInUser, name)}
 
+
+
+     let [CARTTOTAL, setCARTTOTAL] = useState(0);
+      let [reRender, setReRender] = useState(false)
+      const [prices, setPrices] = useState([])
+  const totalCart = (userData?.Cart)? Object.values(userData.Cart).map(({price}) => {
+  }) : []
+
+
+    const isFocused = useIsFocused()
+
+    const cartMap = (userData?.Cart)? Object.values(userData.Cart).map(({name, price, img})=>{
     return(
-      <CartItem img={img} name={name} price={price} key={`${name} ${price}`}/>
-    )
-  })
+      <CartItem reRender={reRender} setReRender={setReRender} img={img} name={name} price={price} key={`${name} ${price}`} hidden={true} deleteCartItem={(name)=>{deleteCartItem(name)}}  signedInUser={signedInUser}/>
+    ) 
+  }) : []
+
+  
+
+  useEffect(()=>{
+    getSignedInUser(setSignedInUser, setUserData)
+  },[ reRender, isFocused])
+
 
 
   useEffect(()=>{
-    setCARTTOTAL(CARTTOTAL)
-  },[CARTTOTAL])
-  
+    const total = (userData?.Cart)? Object.values(userData.Cart).map(({price})=>{   
+      if (Object.values(userData.Cart).length != prices.length){
+        setPrices((old)=>{
+          return [Number(...old), Number(price)]
+        })
+      }
+      
+     }) : 0
+  },[reRender])
 
+   console.log(prices)
+ 
+
+ 
   return (
     <Animated.View className={'flex-1 h-screen w-screen'} entering={ZoomInEasyDown} exiting={ZoomOutEasyDown}>
       <SafeAreaView className={'flex flex-1 h-full '}>
@@ -44,11 +78,11 @@ export default function CartPage() {
       <View className={'bottom-4 flex flex-row justify-between p-4'}>
         <View className={'h-44 p-2'}>
           <Text className={'text-3xl font-semibold text-slate-600'}>Total</Text>
-          <Text className={'text-4xl font-bold '}>${CARTTOTAL}.99</Text>
+          <Text className={'text-4xl font-bold '}>${totalCart}.99</Text>
         </View >
-        <View className={'w-[55%] h-24 rounded-full p-2 bg-rose-300'}>
+        <Pressable onPress={()=>{tt(!t)}} className={'w-[55%] h-24 rounded-full p-2 bg-rose-300'}>
           <Text className={'text-4xl font-bold m-auto text-white'}>Pay Now</Text>
-        </View> 
+        </Pressable> 
       </View>
 
 
