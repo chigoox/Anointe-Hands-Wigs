@@ -11,8 +11,14 @@ function ProductPage ({ navigation, route }) {
     const [userData, setUserData] = useState()
     const {name, price, img, desc} = route.params
     const [inCart,setInCart] = useState(false)
-    const toCart = {Cart:{[name]:{name:name? name:'', price: price? price:'', img:img? img:'', desc:desc? desc: ''}}, CartPrices: price? increment(price):increment(0) }
+    const toCart = {Cart:{[name]:{name:name? name:'', price: price? price:'', img:img? img: 'img', desc:desc? desc: ''}}, CartTotal: price? increment(price):increment(0) }
     const [addedToCart, setAddedToCart] = useState(inCart)
+    const navigate = (to,params) =>{navigation.navigate(to,params)}
+    const toCheckOutBuyNow = (name,price,img,desc) => {navigate('CheckOutPage',{name:name? name:'', price: price? price:'', img:img? img:'img', desc:desc? desc: ''})}
+    
+
+
+
     checkIfItemInCart()
     function checkIfItemInCart(){
         if (userData?.Cart) Object.keys(userData.Cart)
@@ -62,7 +68,7 @@ function ProductPage ({ navigation, route }) {
             </View>
             {/* Product Img */}
             <View className={'bg-rose-300 h-[65%] w-full bottom-12 rounded-b-[40rem] shadow-lg shadow-slate-600'}>
-                <Image className={'h-full rounded-b-[40rem]'} source={{uri:img}}/>
+                <Image className={'h-full rounded-b-[40rem]'} source={{uri:img? img:''}}/>
             </View>
             {/* product info */}
             <View className={'flex  h-72 justify-between'}>
@@ -74,10 +80,16 @@ function ProductPage ({ navigation, route }) {
                 
                 {/* bottom buttons */}
                 <View className={'flex flex-row justify-around w-screen self-end '}>
-                    <TouchableOpacity className={'bg-rose-400 h-22 w-[60%] rounded-full p-4'}>
+                    <TouchableOpacity 
+                        className={'bg-rose-400 h-22 w-[60%] rounded-full p-4'}
+                        onPress={()=>{toCheckOutBuyNow(name,price,img,desc)}}
+                        >
                         <Text className={'font-bold text-5xl m-auto text-white'}>Buy Now</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={addToCart} className={`${addedToCart? 'bg-rose-900':'bg-slate-300'} h-20 w-20 rounded-full p-2 transition-colors`}>
+                    <TouchableOpacity 
+                        onPress={addToCart} 
+                        className={`${addedToCart? 'bg-rose-900':'bg-slate-300'} h-20 w-20 rounded-full p-2 transition-colors`}
+                        >
                         <Ionicons name={'cart'} size={64} color={'white'} />
                     </TouchableOpacity>
                 </View>

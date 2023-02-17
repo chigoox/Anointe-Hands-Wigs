@@ -5,29 +5,40 @@ import CartItem from '../Componets/CartScreen/CartItem';
 import mocCart from '../BackenData/Carts';
 import { getSignedInUser, deleteUserData } from '../MyCodes/ed5'
 import { useIsFocused } from '@react-navigation/native'
+import CartTotal from '../Componets/CartScreen/CartTotal';
 
 
 
-
-export default function CartPage() {
+export default function CartPage({navigation}) {
   const [signedInUser, setSignedInUser] = useState()
   const [userData, setUserData] = useState()
   const deleteCartItem = (name) => {deleteUserData(signedInUser, name)}
+  const navigate = (to,params) =>{navigation.navigate(to,params)}
+  const toItemPage = (name,price,img,desc) => {navigate('ProductPage',{name:name,price:price,img:img,desc:desc})}
+  const toCheckOut = () => {navigate('CheckOutPage')}
 
-
-
-     let [CARTTOTAL, setCARTTOTAL] = useState(0);
+      const isFocused = useIsFocused()
+      let [CARTTOTAL, setCARTTOTAL] = useState(userData?.CartTotal);
       let [reRender, setReRender] = useState(false)
-      const [prices, setPrices] = useState([])
-  const totalCart = (userData?.Cart)? Object.values(userData.Cart).map(({price}) => {
-  }) : []
+      const fetchData = () => {getSignedInUser(setSignedInUser, setUserData)}
 
 
-    const isFocused = useIsFocused()
-
-    const cartMap = (userData?.Cart)? Object.values(userData.Cart).map(({name, price, img})=>{
-    return(
-      <CartItem reRender={reRender} setReRender={setReRender} img={img} name={name} price={price} key={`${name} ${price}`} hidden={true} deleteCartItem={(name)=>{deleteCartItem(name)}}  signedInUser={signedInUser}/>
+      
+    const cartMap = (userData?.Cart)? Object.values(userData.Cart).map(({name, price, img,desc})=>{
+      
+      return(
+      <CartItem signedInUser={signedInUser}
+                img={img} 
+                name={name} 
+                price={price}
+                desc={desc} 
+                key={`${name} ${price}`} 
+                deleteCartItem={(name)=>{deleteCartItem(name)}}
+                setCARTTOTAL={setCARTTOTAL}
+                toItemPage={toItemPage}
+                fetchData={fetchData}
+                cartTotal={CARTTOTAL} 
+                />
     ) 
   }) : []
 
@@ -35,25 +46,18 @@ export default function CartPage() {
 
   useEffect(()=>{
     getSignedInUser(setSignedInUser, setUserData)
-  },[ reRender, isFocused])
+  },[ reRender, isFocused, userData?.CartTotal])
 
-
-
-  useEffect(()=>{
-    const total = (userData?.Cart)? Object.values(userData.Cart).map(({price})=>{   
-      if (Object.values(userData.Cart).length != prices.length){
-        setPrices((old)=>{
-          return [Number(...old), Number(price)]
-        })
-      }
-      
-     }) : 0
-  },[reRender])
-
-   console.log(prices)
- 
 
  
+if (CARTTOTAL != userData?.CartTotal) {
+  getSignedInUser(setSignedInUser, setUserData)
+  setCARTTOTAL(userData?.CartTotal)
+}
+
+ 
+
+  
   return (
     <Animated.View className={'flex-1 h-screen w-screen'} entering={ZoomInEasyDown} exiting={ZoomOutEasyDown}>
       <SafeAreaView className={'flex flex-1 h-full '}>
@@ -78,9 +82,9 @@ export default function CartPage() {
       <View className={'bottom-4 flex flex-row justify-between p-4'}>
         <View className={'h-44 p-2'}>
           <Text className={'text-3xl font-semibold text-slate-600'}>Total</Text>
-          <Text className={'text-4xl font-bold '}>${totalCart}.99</Text>
+          <CartTotal CARTTOTAL={CARTTOTAL}/>
         </View >
-        <Pressable onPress={()=>{tt(!t)}} className={'w-[55%] h-24 rounded-full p-2 bg-rose-300'}>
+        <Pressable onPress={toCheckOut} className={'w-[55%] h-24 rounded-full p-2 bg-rose-300'}>
           <Text className={'text-4xl font-bold m-auto text-white'}>Pay Now</Text>
         </Pressable> 
       </View>

@@ -1,5 +1,14 @@
 {
   "expo": {
+    "plugins": [
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "ed5",
+          "enableGooglePay": true
+        }
+      ]
+    ],
     "name": "anointe-hands-wigs",
     "slug": "anointe-hands-wigs",
     "version": "1.0.0",
@@ -28,6 +37,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7cb50a45-82cf-4c41-b2ae-64e6ba7a6ed3"
+      }
     }
   }
 }

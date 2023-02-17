@@ -49,13 +49,14 @@ export async function addUserInfoToDatabase(data,user){
      
 }
 
-export function getSignedInUser(setUser,SetData){
+export function getSignedInUser(setUser,SetData, setCARTTOTAL, userData){
 
 const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
     if (user) {
         setUser(user)
        fetchData(SetData, user)
+       if (setCARTTOTAL) setCARTTOTAL(userData?.CartTotal)
 
     } else {
         // User is signed out
@@ -65,7 +66,7 @@ const auth = getAuth();
 }
 
 async function deleteUserData(user, cartItem){
-    const userData = doc(DATABASE, 'Users', `${user.email}${user.uid}`);
+    const userData = doc(DATABASE, 'Users', `${user?.email}${user.uid}`);
     // Remove the 'capital' field from the document
     await updateDoc(userData, {
         [`Cart.${cartItem}`]: deleteField()
@@ -75,17 +76,43 @@ async function deleteUserData(user, cartItem){
 
 
 
-
-
-
-async function decreaseCartAmount(user, price){
-    const docRef = doc(DATABASE, "Users", `${user.email}${user.uid}`)
-    const data = {CartPrices: (price && price != 0)? increment(-price):increment(0) }
-    
+async function decreaseCartAmount(user, price, cartTotal){
+    const docRef = doc(DATABASE, "Users", `${user?.email}${user.uid}`)
+    const data = {CartTotal: (price && price > 0)? increment(-1 * price):increment(0) }
+    console.log(cartTotal)
     // Remove the 'capital' field from the document
     await setDoc(docRef, data, { merge: true });
-
+    if (cartTotal == 0 || cartTotal < 0) await updateDoc(docRef, { "CartTotal": 0,}, {merge: true})
 }
+
+
+
+
+
+
+
+
+
+function getZipInfo(zip,set){
+    let responseClone
+fetch(`http://api.zippopotam.us/us/${zip}`)
+.then(function (response) {
+    responseClone = response.clone(); // 2
+    return response.json();
+})
+.then(function (data) {
+    set(data)
+}, function (rejectionReason) { // 3
+    //console.log('Error parsing JSON from response:', rejectionReason, responseClone); // 4
+    responseClone.text() // 5
+    .then(function (bodyText) {
+        //console.log('Received the following instead of valid JSON:', bodyText); // 6
+    });
+});
+}
+
+
+
 
 async function fetchProducts(setProducts){
     const querySnapshot = await getDocs(collection(DATABASE, "Products"));
@@ -109,4 +136,17 @@ async function fetchData(setUserData, user){
 
 }
 
-export {fetchProducts, fetchData, deleteUserData, updateuserDataArray, decreaseCartAmount}
+async function fetchAva(setAva, setApts){
+    const docRef = doc(DATABASE, 'Appointments','Availability');
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        setAva(docSnap.data());
+    } else {
+    // doc.data() will be undefined in this case
+    console.log("No such document!");
+    }
+
+
+}
+
+export {fetchProducts, fetchAva, fetchData, deleteUserData, updateuserDataArray, decreaseCartAmount, getZipInfo}

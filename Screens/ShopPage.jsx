@@ -23,18 +23,65 @@ export default function ShopPage({ navigation }) {
   }
   
 
-  
   if (productsFromDataBase) convertProductToArray()
-  //
 
+
+  
+  const categories = ['Featured','Female', 'Male','Boy', 'Girl', 'All']
+  const [selected,setSelected] = useState(categories.map((item)=>{
+    return {[item] : false}
+  }))
+
+
+  let result = true;
+
+  for (let i in selected) {
+      if (selected[i] === true) {
+          result = false;
+          break;
+      }
+  }
+
+  if (result) setSelected((old) =>{
+    return {...old, All:true}
+  })
+
+
+  const categoriesMap = categories.map((item) => {
+
+    const onclick = () => {
+      setSelected((old)=>{
+      Object.keys(old).forEach((key, index) => { old[key] = false })
+      return {...old, [item]:true}
+    })
+  }
+    
+    return(
+      <TouchableOpacity name={item} key={item} onPress={onclick} className={`${selected[item]? 'bg-rose-700':'bg-slate-300'} transition-all h-10 ease-in-out duration-1000  w-24 m-2 rounded-full p-2`}>
+        <Text className={'text-white text-center font-semibold text-lg'}>{item}</Text>
+      </TouchableOpacity>
+    )
+  })
+
+  
   useEffect(()=>{fetchProducts(setProductsFromDataBase); },[])
   //create shop items
-  const productMap = productsFormated.map(({ name, price, img, desc})=>{
-    return(
+  const productMap = productsFormated.map(({ name, price, img, desc, category})=>{
+   
+
+    
+
+    if (selected[category]) {return(
       <TouchableOpacity onPress={()=>{toItemPage(name,price,img,desc)}} className={` m-auto my-8 focus:opacity-20`} key={`${name + 'bfnm'}`}>
         <Product name={name} price={price} img={img} key={`${name + 'esgrd'}`}/>
       </TouchableOpacity>
-    )
+    )}else if(selected.All){
+      return(
+        <TouchableOpacity onPress={()=>{toItemPage(name,price,img,desc)}} className={` m-auto my-8 focus:opacity-20`} key={`${name + 'bfnm'}`}>
+          <Product name={name} price={price} img={img} key={`${name + 'esgrd'}`}/>
+        </TouchableOpacity>
+      )
+    }
   })
 
 
@@ -58,29 +105,18 @@ export default function ShopPage({ navigation }) {
        </View>
 
        {/*Info Box*/}
-       <View className="bg-rose-300 h-40 w-[90%] m-auto rounded-[30rem] mt-20 flex flex-row flex-1">
-          <Image className={'h-[400px] w-[400px] scale-[.42] bottom-32 rounded-bl-[200%] right-28'} source={require('../assets/shopPage-iNFObar.png')}></Image>
-          <View className={'relative right-[137%] w-[50%] h-full rounded-[30rem] p-4'}>
+       <View className="bg-rose-300 h-40 w-[90%] m-auto rounded-[30rem] mt-20 flex flex-row items-center">
+          <Image className={'h-[400px] w-[400px] scale-[.44] bottom-2 flex-grow right-28 relative rounded-bl-[200%]'} source={require('../assets/shopPage-iNFObar.png')}></Image>
+          <View className={'relative right-[135%] scale-95 w-[50%]  h-full flex-grow  rounded-[30rem] p-4'}>
             <Text className={'font-bold text-white text-3xl'}>Big Sale</Text>
-            <Text className={'text-slate-200 text-xl'}>Get a new look for upto 50% off</Text>
+            <Text className={'text-slate-200 text-xl relative'}>Get a new look for upto 50% off</Text>
           </View>
        </View>
        {/*Category Box*/}
        <ScrollView className={''} nestedScrollEnabled = {true} horizontal>
           {/* make this into a componet that checks for catigory in backend */}
          <View className={'flex flex-row'}>
-          <View className={'bg-slate-300 h-8 w-24 m-2 rounded-full'}>
-            <Text className={'text-white text-center font-semibold p-1 text-lg'}>Featured</Text>
-          </View>
-          <View className={'bg-slate-300 h-8 w-24 m-2 rounded-full'}>
-            <Text className={'text-white text-center font-semibold p-1 text-lg'}>Women</Text>
-          </View>
-          <View className={'bg-slate-300 h-8 w-24 m-2 rounded-full'}>
-            <Text className={'text-white text-center font-semibold p-1 text-lg'}>Boys</Text>
-          </View>
-          <View className={'bg-slate-300 h-8 w-24 m-2 rounded-full'}>
-            <Text className={'text-white text-center font-semibold p-1 text-lg'}>Girls</Text>
-          </View>
+          {categoriesMap} 
          </View>
        </ScrollView>
    
