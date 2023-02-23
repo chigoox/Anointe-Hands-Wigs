@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import {WelcomePage, AboutPage, ShopPage, CartPage, AppointmentPage, ProductPage, CheckOutPage, PaymentInfoPage} from './Screens/0PageHandler';
+import {WelcomePage, AboutPage, ShopPage, CartPage, AppointmentPage, ProductPage, CheckOutPage, PaymentInfoPage, userProfilePage} from './Screens/0PageHandler';
 
 
 
@@ -14,7 +14,7 @@ import {WelcomePage, AboutPage, ShopPage, CartPage, AppointmentPage, ProductPage
 const Tab = createBottomTabNavigator();
 function HomeScreen(){
 return(
-    <Tab.Navigator screenOptions={{ headerShown: false }} initialRouteName="Appointment" tabBar={props => <MyTabBar {...props} />}>
+    <Tab.Navigator screenOptions={{ headerShown: false }} initialRouteName="Shop" tabBar={props => <MyTabBar {...props} />}>
       <Tab.Screen name="Shop" component={ShopPage} />
       <Tab.Screen name="Cart" component={CartPage} />
       <Tab.Screen name="Appointment" component={AppointmentPage} />
@@ -29,12 +29,13 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="HomeScreen">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="WelcomePage">
         <Stack.Screen name="WelcomePage" component={WelcomePage} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="ProductPage" component={ProductPage} />
         <Stack.Screen name="CheckOutPage" component={CheckOutPage} />
         <Stack.Screen name="PaymentInfoPage" component={PaymentInfoPage} />
+        <Stack.Screen name="userProfilePage" component={userProfilePage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

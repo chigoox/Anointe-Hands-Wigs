@@ -7,11 +7,12 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import {STRIPE_API_KEY} from '@env'
 import { StripeProvider, useStripe, useConfirmPayment, ConfirmSetupIntentError } from '@stripe/stripe-react-native';
 
+
 const CheckOutPage = ({navigation, route}) => {
    const API_URL = 'http://localhost:4242'
 
 
-    const YOUR_LAMBDA_ENDPOINT='https://9nmw6alb93.execute-api.us-east-1.amazonaws.com/Stage/capture'
+    const YOUR_LAMBDA_ENDPOINT='https://fyqmwxsccl.execute-api.us-east-1.amazonaws.com/default/paymentProcessing'
 
     const {name, price, img, desc} = route.params? route.params : {name:undefined, price:undefined, img:undefined, desc:undefined}
     const [signedInUser, setSignedInUser] = useState()
@@ -41,15 +42,8 @@ const CheckOutPage = ({navigation, route}) => {
             method: 'POST',
             body: JSON.stringify({
               amount: 200,
-              token:userData?.CartToken,
               currency: 'usd',
-              source: {
-                object: 'card',
-                number: 4242424242424242,
-                exp_month: userData?.userDetails?.cardDetails?.expiryMonth,
-                exp_year: userData?.userDetails?.cardDetails?.expiryYear,
-                cvc: 234,
-              },
+              source: userData?.CartToken,
             }),
           });
       

@@ -4,6 +4,7 @@ import Animated,{ZoomOutEasyDown, ZoomInEasyDown, FadeInUp, FadeOutDown} from 'r
 import Product from '../Componets/ShopScreen/Product';
 import  {fetchProducts} from '../MyCodes/ed5'
 import mocProducts from '../BackenData/Products'
+import UserProfileButton from '../Componets/Universal/UserProfileButton';
 
 
 
@@ -99,11 +100,8 @@ export default function ShopPage({ navigation }) {
           <Text className={'text-slate-600 text-center font text-lg'}>Hello name</Text>
           <Text className={'text-slate-800 text-center font-bold text-lg'}>State, City</Text>
         </View>
-        <View className={'h-10 w-10 rounded-full overflow-hidden'}>
-          <Image className={'top-0 right-0 left-0 bottom-0 absolute rounded-3xl z-0 opacity-90'} source={{uri: 'https://s.hdnux.com/photos/52/62/01/11214928/4/1200x0.jpg',}}></Image>
-        </View>
+          <UserProfileButton navigation={navigation}/>
        </View>
-
        {/*Info Box*/}
        <View className="bg-rose-300 h-40 w-[90%] m-auto rounded-[30rem] mt-20 flex flex-row items-center">
           <Image className={'h-[400px] w-[400px] scale-[.44] bottom-2 flex-grow right-28 relative rounded-bl-[200%]'} source={require('../assets/shopPage-iNFObar.png')}></Image>
