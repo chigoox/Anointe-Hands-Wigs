@@ -25,8 +25,6 @@ export function handleInput5(key, value, stateSetter) {
 
 
 export async function addUserInfoToDatabase(data, user) {
-
-
     const docRef = doc(DATABASE, "Users", `${user.email}${user.uid}`)
     await setDoc(docRef, data, { merge: true });
 
@@ -76,6 +74,17 @@ async function deleteUserData(user, cartItem) {
     // Remove the 'capital' field from the document
     await updateDoc(userData, {
         [`Cart.${cartItem}`]: deleteField()
+    });
+
+}
+
+
+async function deleteUserCart(user) {
+    const userData = doc(DATABASE, 'Users', `${user?.email}${user.uid}`);
+    // Remove the 'capital' field from the document
+    await updateDoc(userData, {
+        Cart: deleteField(),
+        CartTotal: deleteField()
     });
 
 }
@@ -162,6 +171,16 @@ async function fetchData(setUserData, user) {
 
 }
 
+async function fetchDocument(collection, document, setterfunction) {
+    const docRef = doc(DATABASE, collection, document);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        setterfunction(docSnap.data());
+    } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+    }
+}
 
 async function fetchAppointments(setAppointmentData, x) {
     const docRef = doc(DATABASE, 'Appointments', 'Appointments');
@@ -187,4 +206,4 @@ async function fetchAva(setAva, setApts) {
 
 }
 
-export { deleteAdminData5, deleteUserData5, fetchAppointments, fetchProducts, fetchAva, fetchData, deleteUserData, updateuserDataArray, decreaseCartAmount, getZipInfo }
+export { fetchDocument, deleteUserCart, deleteAdminData5, deleteUserData5, fetchAppointments, fetchProducts, fetchAva, fetchData, deleteUserData, updateuserDataArray, decreaseCartAmount, getZipInfo }

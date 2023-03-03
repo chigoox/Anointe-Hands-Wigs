@@ -5,26 +5,36 @@ import Product from '../Componets/ShopScreen/Product';
 import { fetchProducts, getRand } from '../MyCodes/ed5'
 import mocProducts from '../BackenData/Products'
 import UserProfileButton from '../Componets/Universal/UserProfileButton';
+import UserTopInfo from '../Componets/Universal/UserTopInfo';
+import LogoutButton from '../Componets/Universal/LogoutButton';
+import { handleInput5, addUserInfoToDatabase, getSignedInUser } from "../MyCodes/ed5";
+import { getAuth, signOut } from "firebase/auth";
+import { useIsFocused } from '@react-navigation/native';
 
 
 
 export default function ShopPage({ navigation }) {
+  const isFocused = useIsFocused()
   const [productsFromDataBase, setProductsFromDataBase] = useState()
+  const [productsFromDataBaseOLD, setProductsFromDataBaseOLD] = useState()
+
   const [productsFormated, setProductsFormated] = useState([])
+  const [userData, setUserData] = useState();
+  const [user, setUser] = useState()
   const navigate = (to, params) => { navigation.navigate(to, params) }
   const toItemPage = (name, price, img, desc) => { navigate('ProductPage', { name: name, price: price, img: img, desc: desc }) }
   function convertProductToArray() {
     let temp = []
-    if (productsFromDataBase) Object.values(productsFromDataBase).forEach((key) => {
+    if (productsFromDataBaseOLD) Object.values(productsFromDataBaseOLD).forEach((key) => {
 
       temp = [...temp, key]
 
     })
-    if (Object.keys(productsFromDataBase).length != productsFormated.length) { setProductsFormated(temp) }
+    if (Object.keys(productsFromDataBaseOLD).length != productsFormated.length) { setProductsFormated(temp) }
   }
 
 
-  if (productsFromDataBase) convertProductToArray()
+  if (productsFromDataBaseOLD) convertProductToArray()
 
 
 
@@ -65,7 +75,16 @@ export default function ShopPage({ navigation }) {
   })
 
 
-  useEffect(() => { fetchProducts(setProductsFromDataBase); }, [])
+  if (productsFromDataBase != productsFromDataBaseOLD) setProductsFromDataBaseOLD(productsFromDataBase)
+
+  useEffect(() => {
+    getSignedInUser(setUser, setUserData)
+  }, [isFocused])
+
+  useEffect(() => {
+    fetchProducts(setProductsFromDataBase);
+    //if (productsFromDataBase != productsFromDataBaseOLD) setProductsFromDataBaseOLD(productsFromDataBase)
+  }, [])
   //create shop items
   const productMap = productsFormated.map(({ name, price, img, desc, category }) => {
 
@@ -97,11 +116,8 @@ export default function ShopPage({ navigation }) {
       <SafeAreaView className={'flex-grow flex-1 h-screenS '}>
         {/*TOP BAR */}
         <View className={'flex flex-row justify-between mx-2'}>
-          <Pressable className={'bg-black h-10 w-10 rounded-full'}></Pressable>
-          <View>
-            <Text className={'text-slate-600 text-center font text-lg'}>Hello name</Text>
-            <Text className={'text-slate-800 text-center font-bold text-lg'}>State, City</Text>
-          </View>
+          <LogoutButton navigation={navigation} />
+          <UserTopInfo userData={userData} />
           <UserProfileButton navigation={navigation} />
         </View>
         {/*Info Box*/}
@@ -115,14 +131,14 @@ export default function ShopPage({ navigation }) {
         {/*Category Box*/}
         <ScrollView className={''} nestedScrollEnabled={true} horizontal>
           {/* make this into a componet that checks for catigory in backend */}
-          <View className={'flex flex-row'}>
+          <View className={'flex flex-row p-0 h-14'}>
             {categoriesMap}
           </View>
         </ScrollView>
 
         {/*SHOP ITEMS Box*/}
         <Animated.View>
-          <View className={'flex flex-row flex-wrap mb-20'}>
+          <View className={'flex flex-row flex-wrap mt-0 mb-20'}>
             {productMap}
           </View>
         </Animated.View>

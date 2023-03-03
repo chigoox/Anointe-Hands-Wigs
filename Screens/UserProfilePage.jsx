@@ -30,10 +30,12 @@ import Profile from "../Componets/UserProfile/Profile";
 import Orders from "../Componets/UserProfile/Orders";
 import Appointments from "../Componets/UserProfile/Appointments";
 
+
 function UserProfilePage({ navigation }) {
   const [userData, setUserData] = useState();
   const [inputData, setInputData] = useState();
   const [user, setUser] = useState();
+  const getuserData = () => { getSignedInUser(setUser, setUserData) }
   const [selectedScreen, setSelectedScreen] = useState({ Profile: true, Orders: false, Appointment: false })
   const toggleSeletectedScreen = (screen) => {
     setSelectedScreen({ Profile: false, Orders: false, Appointment: false })
@@ -60,9 +62,7 @@ function UserProfilePage({ navigation }) {
     navigation.goBack();
   };
 
-  const cancel = () => {
-    props.navigation.goBack();
-  };
+
 
   useEffect(() => {
     getSignedInUser(setUser, setUserData);
@@ -71,8 +71,8 @@ function UserProfilePage({ navigation }) {
 
 
   function SelectedView() {
-    if (selectedScreen.Profile) return <Profile userData={userData} user={user} />
-    if (selectedScreen.Orders) return <Orders />
+    if (selectedScreen.Profile) return <Profile userData={userData} user={user} navigation={navigation} />
+    if (selectedScreen.Orders) return <Orders getuserData={getuserData} userData={userData} user={user} />
     if (selectedScreen.Appointment) return <Appointments user={user ? user : ''} appointmentData={userData?.Appointment ? userData?.Appointment : ''} />
   }
 

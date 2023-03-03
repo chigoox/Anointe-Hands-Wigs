@@ -5,9 +5,11 @@ import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { getSignedInUser, addUserInfoToDatabase, fetchAva, getRand, addAdminInfoToDatabase, fetchAppointments } from '../MyCodes/ed5'
 import TimesAva from '../Componets/Appointments/TimesAva';
 import { useIsFocused } from '@react-navigation/native'
+import LogoutButton from '../Componets/Universal/LogoutButton';
+import UserProfileButton from '../Componets/Universal/UserProfileButton';
 
 
-export default function AppointmentPage() {
+export default function AppointmentPage({ navigation }) {
   const [signedInUser, setSignedInUser] = useState()
   const [userData, setUserData] = useState()
   const [availability, setAvailability] = useState()
@@ -23,6 +25,7 @@ export default function AppointmentPage() {
   const [oldDate, setOldDate] = useState(selectedDate)
   const toggleTapped = () => { setTapped(!tapped) }
   const isFocused = useIsFocused()
+  const [selectedAppointment, setSelectedApointment] = useState()
 
 
   const _markedDates = () => {
@@ -78,6 +81,7 @@ export default function AppointmentPage() {
   }
 
 
+  const [selected, setselected] = useState()
   const mapTimes = availability?.time[selectedDay] ? Object.values(availability?.time[selectedDay]).map((item) => {
     const apttake = () => {
       let result = false
@@ -93,7 +97,15 @@ export default function AppointmentPage() {
     const notAvaiable = (takenApts != undefined) ? apttake() : false
     if (!notAvaiable) {
       return (
-        <TimesAva toggleTapped={toggleTapped} key={getRand(9999999)} time={item} setAppointments={setAppointments} newTakenApt={newTakenApt} setNewTakenApt={setNewTakenApt} />
+        <TimesAva
+          toggleTapped={toggleTapped}
+          key={getRand(9999999)} time={item}
+          setAppointments={setAppointments}
+          newTakenApt={newTakenApt}
+          setNewTakenApt={setNewTakenApt}
+          setselected={setselected}
+          selected={selected} />
+
       )
     }
 
@@ -113,18 +125,15 @@ export default function AppointmentPage() {
 
 
   useEffect(() => {
-    getSignedInUser(setSignedInUser, setUserData)
-    fetchAppointments(setAppointmentData)
-    fetchAva(setAvailability)
-    _markedDates()
+
 
     setMarkedDates((old => {
-
       return {
         ...old,
         [oldDate]: { selected: false, selectedColor: 'blue' }
       }
     }))
+
     setMarkedDates((old => {
 
       return {
@@ -133,10 +142,14 @@ export default function AppointmentPage() {
       }
     }))
 
+    _markedDates()
     setOldDate(selectedDate)
   }, [selectedDate, tapped, isFocused])
 
   useEffect(() => {
+    getSignedInUser(setSignedInUser, setUserData)
+    fetchAppointments(setAppointmentData)
+    fetchAva(setAvailability)
     if (appointmentData[selectedDate] != undefined) {
       setTakenApts(Object.keys(appointmentData[selectedDate]))
     } else {
@@ -148,18 +161,27 @@ export default function AppointmentPage() {
   return (
     <Animated.View className={'flex-1 h-screen w-screen'} entering={ZoomInEasyDown} exiting={ZoomOutEasyDown}>
       <SafeAreaView className={'flex flex-1 h-full'}>
-        <Text className={'font-bold text-3xl text-center'}>Appointments</Text>
-        <View className={'h-[40%] p-2'}>
-          <ScrollView >
+
+        <View className={'flex flex-row justify-between px-2'}>
+          <LogoutButton navigation={navigation} />
+          <Text className={'font-bold text-3xl text-center'}>Appointments</Text>
+          <UserProfileButton navigation={navigation} />
+        </View>
+
+        <View className={'h-72 p-2 z-0  relative'}>
+          <View className={'flex flex-row flex-wrap'}>
 
             {mapTimes}
 
-          </ScrollView>
+          </View>
+          <Text className={'absolute bottom-0 text-center w-full'}>$35 booking fee</Text>
         </View>
         <Calendar
           className={'rounded-xl shadow w-[90%] mx-auto'}
           markedDates={markedDates}
-
+          disableMonthChange={true}
+          hideArrows={true}
+          initialDate={new Date().toJSON().slice(0, 10).replace(/-/g, '/')}
           onDayPress={day => {
             setSelectedDate(day.dateString)
             setSelectedDay(getDayOfWeek(day.dateString).toLowerCase())

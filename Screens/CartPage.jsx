@@ -19,6 +19,7 @@ import { getSignedInUser, deleteUserData } from "../MyCodes/ed5";
 import { useIsFocused } from "@react-navigation/native";
 import CartTotal from "../Componets/CartScreen/CartTotal";
 import UserProfileButton from "../Componets/Universal/UserProfileButton";
+import LogoutButton from "../Componets/Universal/LogoutButton";
 
 export default function CartPage({ navigation }) {
   const [signedInUser, setSignedInUser] = useState();
@@ -45,24 +46,24 @@ export default function CartPage({ navigation }) {
 
   const cartMap = userData?.Cart
     ? Object.values(userData.Cart).map(({ name, price, img, desc }) => {
-        return (
-          <CartItem
-            signedInUser={signedInUser}
-            img={img}
-            name={name}
-            price={price}
-            desc={desc}
-            key={`${name} ${price}`}
-            deleteCartItem={(name) => {
-              deleteCartItem(name);
-            }}
-            setCARTTOTAL={setCARTTOTAL}
-            toItemPage={toItemPage}
-            fetchData={fetchData}
-            cartTotal={CARTTOTAL}
-          />
-        );
-      })
+      return (
+        <CartItem
+          signedInUser={signedInUser}
+          img={img}
+          name={name}
+          price={price}
+          desc={desc}
+          key={`${name} ${price}`}
+          deleteCartItem={(name) => {
+            deleteCartItem(name);
+          }}
+          setCARTTOTAL={setCARTTOTAL}
+          toItemPage={toItemPage}
+          fetchData={fetchData}
+          cartTotal={CARTTOTAL}
+        />
+      );
+    })
     : [];
 
   useEffect(() => {
@@ -83,9 +84,9 @@ export default function CartPage({ navigation }) {
       <SafeAreaView className={"flex flex-1 h-full "}>
         {/*TOP BAR */}
         <View className={"flex flex-row justify-between mx-2"}>
-          <Pressable className={"bg-black h-10 w-10 rounded-full"}></Pressable>
+          <LogoutButton navigation={navigation} />
           <View>
-            <Text className={"text-slate-800 text-center font-bold text-lg"}>
+            <Text className={'font-bold text-3xl text-center'}>
               Cart
             </Text>
           </View>
