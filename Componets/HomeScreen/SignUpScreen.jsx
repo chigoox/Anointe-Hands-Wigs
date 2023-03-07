@@ -1,7 +1,7 @@
 import { ScrollView, View, Text, SafeAreaView, TextInput, Pressable, KeyboardAvoidingView } from 'react-native'
 import React, { useState } from 'react'
 import Animated, { FadeOutUp, FadeInUp, FadeOut, FadeOutRight } from 'react-native-reanimated';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { handleInput5, addUserInfoToDatabase } from '../../MyCodes/ed5'
 import LoginError from './LoginError';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -21,6 +21,14 @@ export default function SignUpScreen(props, { navigation }) {
     setError()
   }
 
+  function sendVerificationEmail() {
+    const auth = getAuth();
+    sendEmailVerification(auth.currentUser)
+      .then(() => {
+        // Email verification sent!
+        // ...
+      });
+  }
 
 
   //firebase Create User
@@ -32,6 +40,8 @@ export default function SignUpScreen(props, { navigation }) {
         .then((userCredential) => {
           const user = userCredential.user
           addUserInfoToDatabase(inputData, user)
+          sendVerificationEmail()
+          props.toggleSignUp()
 
         })
         .catch((error) => {

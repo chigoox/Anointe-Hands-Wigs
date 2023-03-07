@@ -1,6 +1,6 @@
-import { SafeAreaView, Text, View, Image, Pressable, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView, Text, View, Image, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native'; useState
 import React, { useEffect, useState } from 'react'
-import Animated, { ZoomOutEasyDown, ZoomInEasyDown, FadeInUp, FadeOutDown } from 'react-native-reanimated';
+import Animated, { ZoomOutEasyDown, ZoomInEasyDown, FadeInUp, FadeOutDown, FadeInDown } from 'react-native-reanimated';
 import Product from '../Componets/ShopScreen/Product';
 import { fetchProducts, getRand } from '../MyCodes/ed5'
 import mocProducts from '../BackenData/Products'
@@ -10,10 +10,10 @@ import LogoutButton from '../Componets/Universal/LogoutButton';
 import { handleInput5, addUserInfoToDatabase, getSignedInUser } from "../MyCodes/ed5";
 import { getAuth, signOut } from "firebase/auth";
 import { useIsFocused } from '@react-navigation/native';
+import Notification from '../Componets/Universal/Notification';
 
 
-
-export default function ShopPage({ navigation }) {
+export default function ShopPage({ navigation, route }) {
   const isFocused = useIsFocused()
   const [productsFromDataBase, setProductsFromDataBase] = useState()
   const [productsFromDataBaseOLD, setProductsFromDataBaseOLD] = useState()
@@ -21,6 +21,10 @@ export default function ShopPage({ navigation }) {
   const [productsFormated, setProductsFormated] = useState([])
   const [userData, setUserData] = useState();
   const [user, setUser] = useState()
+
+  const [notificationPaymentComplete, seNotificationPaymentComplete] = useState(false)
+  const toggleNotifiComplete = () => { seNotificationPaymentComplete(!notificationPaymentComplete) }
+
   const navigate = (to, params) => { navigation.navigate(to, params) }
   const toItemPage = (name, price, img, desc) => { navigate('ProductPage', { name: name, price: price, img: img, desc: desc }) }
   function convertProductToArray() {
@@ -76,6 +80,12 @@ export default function ShopPage({ navigation }) {
 
 
   if (productsFromDataBase != productsFromDataBaseOLD) setProductsFromDataBaseOLD(productsFromDataBase)
+  if (route?.params?.PaymentComplete[0] == true) {
+    toggleNotifiComplete()
+    route.params.PaymentComplete[0] = false
+  }
+
+
 
   useEffect(() => {
     getSignedInUser(setUser, setUserData)
@@ -83,6 +93,7 @@ export default function ShopPage({ navigation }) {
 
   useEffect(() => {
     fetchProducts(setProductsFromDataBase);
+
     //if (productsFromDataBase != productsFromDataBaseOLD) setProductsFromDataBaseOLD(productsFromDataBase)
   }, [])
   //create shop items
@@ -112,8 +123,12 @@ export default function ShopPage({ navigation }) {
 
   //shop screen
   return (
-    <Animated.ScrollView contentContainerStyle={{ flexGrow: 1 }} nestedScrollEnabled={true} className={'flex-1  w-screen'} entering={ZoomInEasyDown} exiting={ZoomOutEasyDown} contentInsetAdjustmentBehavior="automatic">
+    <Animated.ScrollView contentContainerStyle={{ flexGrow: 1 }} nestedScrollEnabled={true} className={'flex-1  w-screen'} entering={FadeInDown} exiting={ZoomOutEasyDown} contentInsetAdjustmentBehavior="automatic">
       <SafeAreaView className={'flex-grow flex-1 h-screenS '}>
+        {notificationPaymentComplete && <Notification text={`${route.params.PaymentComplete[1]}`} color={false} toggleNotification={toggleNotifiComplete} />}
+        {!productsFromDataBase && <View className="z-40 absolute h-screen bottom-0 top-0 flex w-full">
+          <ActivityIndicator size="large" className={'m-auto text-red-900'} color={'pink'} />
+        </View>}
         {/*TOP BAR */}
         <View className={'flex flex-row justify-between mx-2'}>
           <LogoutButton navigation={navigation} />

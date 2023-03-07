@@ -9,10 +9,11 @@ const TimesAva = ({ time, setAppointments, setNewTakenApt, toggleTapped, setsele
     toggleTapped()
     setNewTakenApt(timeString)
     setAppointments(timeNumber, timeString)
+    setselected({ [time]: true })
   }
   const Mark = selected ? selected[time] : null
   return (
-    <TouchableOpacity onPress={() => { Tapped; setselected({ [time]: true }) }} className={`${false ? 'hidden' : ''} ${Mark ? 'bg-rose-300' : 'bg-slate-100'} m-auto   shadow shadow-slate-400  h-16 w-20 mx-auto my-4 rounded-xl z-0`}>
+    <TouchableOpacity onPress={() => { Tapped() }} className={`${false ? 'hidden' : ''} ${Mark ? 'bg-rose-300' : 'bg-slate-100'} m-auto   shadow shadow-slate-400  h-16 w-20 mx-auto my-4 rounded-xl z-0`}>
       <Text className={'text-3xl text-center font-bold m-auto'}>{time.match(/[0-9]?[0-9][a|p][m]/)}</Text>
     </TouchableOpacity>
   )

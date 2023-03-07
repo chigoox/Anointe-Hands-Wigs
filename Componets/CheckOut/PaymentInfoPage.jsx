@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react'
 import Animated, { FadeInUp, FadeOutRight } from 'react-native-reanimated';
 import { handleInput5, addUserInfoToDatabase, getZipInfo, getSignedInUser } from '../../MyCodes/ed5'
 import LoginError from '../HomeScreen/LoginError';
-import { CardField, Token, useStripe } from '@stripe/stripe-react-native';
-
+import { CardField, useStripe } from '@stripe/stripe-react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 function PaymentInfoPage(props) {
 
@@ -12,24 +12,11 @@ function PaymentInfoPage(props) {
 
   const [userData, setUserData] = useState()
   const [inputData, setInputData] = useState()
-  const [cardDetails, setCardDetails] = useState()
   const [user, setUser] = useState()
   const [error, setError] = useState()
   const [zip, setZIP] = useState(0)
   const zipcode = inputData?.zip ? inputData.zip : userData?.zip ? userData.zip : ''
   if (!inputData) setInputData({ zip: userData?.zip ? userData.zip : '' })
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -45,10 +32,7 @@ function PaymentInfoPage(props) {
       }
 
     })
-    setInputData((old) => {
-      return ({ ...old, tokenID: token ? token : '' })
-    })
-    props.navigation.goBack('CheckOutPage', cardDetails)
+    props.navigation.navigate('CheckOutPage', { cardComplete: inputData?.cardDetails?.complete ? inputData?.cardDetails?.complete : false })
 
 
   }
@@ -72,41 +56,41 @@ function PaymentInfoPage(props) {
 
   useEffect(() => {
     getZipInfo(zipcode, setZIP)
-    addUserInfoToDatabase({ userDetails: inputData }, user)
+    if (user) addUserInfoToDatabase({ userDetails: inputData }, user)
   }, [inputData])
 
 
   return (
-    <Animated.ScrollView entering={FadeInUp} exiting={FadeOutRight} className={'absolute h-screen w-full z-20 bg-white transition-all duration-[20] ease-in-out'}>
+    <Animated.View entering={FadeInUp} exiting={FadeOutRight} className={'absolute h-screen w-full z-20 bg-white transition-all duration-[20] ease-in-out'}>
       {error && <LoginError error={error} clear={clearError} />}
       <SafeAreaView className={'my-10 mx-2'}>
-        <Text className={'text-sky-400 font-bold text-8xl'}>Shipping & Payment</Text>
+        <KeyboardAwareScrollView className="h-[full] w-full  m-auto rounded-xl" >
+          <Text className={'text-sky-400 font-bold text-8xl'}>Shipping & Payment</Text>
 
-        <KeyboardAvoidingView className="h-[40%] w-full  m-auto rounded-xl" >
           <TextInput className={'border-black text-black font-bold p-4 border-2 rounded-full m-2 placeholder:text-slate-600'}
             onChangeText={(text) => { handleInput5('name', text, setInputData) }}
             placeholder={'Full name'}
             autoComplete={'name'}
-            defaultValue={userData?.name ? userData.name : ''}
+            defaultValue={userData?.Name ? userData.Name : ''}
           />
           <TextInput className={'border-black text-black font-bold p-4 border-2 rounded-full m-2 placeholder:text-slate-600'}
             onChangeText={(text) => { handleInput5('email', text, setInputData) }}
             placeholder={'Email'}
             autoComplete={'email'}
-            defaultValue={userData?.email ? userData.email : ''}
+            defaultValue={userData?.Email ? userData.Email : ''}
           />
           <TextInput className={'border-black text-black p-4 border-2 rounded-full m-2 placeholder:text-slate-600'}
             onChangeText={(text) => handleInput5('address', text, setInputData)}
             placeholder={'Address: 123 main st apt 4'}
             inputMode={'text'}
-            defaultValue={userData?.address ? userData.address : ''}
+            defaultValue={userData?.userDetails?.address ? userData?.userDetails?.address : ''}
           />
           <TextInput className={'border-black text-black p-4 border-2 rounded-full m-2 placeholder:text-slate-600'}
             onChangeText={(text) => handleInput5('zip', text, setInputData)}
             placeholder={'Zip Code'}
             inputMode={'numeric'}
             keyboardType={'number-pad'}
-            defaultValue={userData?.zip ? userData.zip : ''}
+            defaultValue={userData?.userDetails?.zip ? userData?.userDetails?.zip : ''}
             id={'zip'}
           />
 
@@ -152,9 +136,9 @@ function PaymentInfoPage(props) {
               <Text className={'text-center font-bold text-sky-400 text-5xl p-3'}>Cancel</Text>
             </Pressable>
           </View>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
-    </Animated.ScrollView >
+    </Animated.View >
 
   )
 }

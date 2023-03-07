@@ -1,12 +1,15 @@
-import { SafeAreaView, Text, View, Image, Pressable, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView, Text, View, ActivityIndicator, Pressable, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react'
-import Animated, { ZoomOutEasyDown, ZoomInEasyDown, FadeInUp, FadeOutDown } from 'react-native-reanimated';
+import Animated, { ZoomOutEasyDown, ZoomInEasyDown, FadeInUp, FadeOutDown, FadeInDown, SlideInUp } from 'react-native-reanimated';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { getSignedInUser, addUserInfoToDatabase, fetchAva, getRand, addAdminInfoToDatabase, fetchAppointments } from '../MyCodes/ed5'
 import TimesAva from '../Componets/Appointments/TimesAva';
 import { useIsFocused } from '@react-navigation/native'
 import LogoutButton from '../Componets/Universal/LogoutButton';
 import UserProfileButton from '../Componets/Universal/UserProfileButton';
+import { STRIPE_API_KEY } from '@env'
+import { StripeProvider, useStripe, useConfirmPayment, ConfirmSetupIntentError, CardField } from '@stripe/stripe-react-native';
+import Book from '../Componets/Appointments/Book';
 
 
 export default function AppointmentPage({ navigation }) {
@@ -23,10 +26,11 @@ export default function AppointmentPage({ navigation }) {
   const [tapped, setTapped] = useState(false)
   const [markedDates, setMarkedDates] = useState()
   const [oldDate, setOldDate] = useState(selectedDate)
-  const toggleTapped = () => { setTapped(!tapped) }
+  const [selected, setselected] = useState()
+  const toggleTapped = () => { setTapped(!tapped); setselected() }
   const isFocused = useIsFocused()
-  const [selectedAppointment, setSelectedApointment] = useState()
-
+  const [booking, setBooking] = useState(false)
+  const toggleBooking = (booked) => { setBooking(!booking); if (booked == true) bookApt() }
 
   const _markedDates = () => {
     (Object.keys(appointmentData)).forEach((item) => {
@@ -38,27 +42,7 @@ export default function AppointmentPage({ navigation }) {
 
   }
 
-
   if (markedDates && String(Object.keys(markedDates)) == 'undefined') _markedDates()
-
-
-
-
-  /* {
-  
-    [String(Object.keys(appointmentData))]:{selected: true, selectedColor: 'pink' },
-    '2023-02-17': {selected: true, marked: true, selectedColor: 'blue'},
-    '2012-05-17': {marked: true},
-    '2012-05-18': {marked: true, dotColor: 'red', activeOpacity: 0},
-    '2012-05-19': {disabled: true, disableTouchEvent: true},
-    [selectedDate]: {selected: true, selectedColor: 'blue' },
-  
-  
-  
-  } */
-
-
-
 
   function getDayOfWeek(date) {
     const dayOfWeek = new Date(date).getDay() + 1;
@@ -68,6 +52,7 @@ export default function AppointmentPage({ navigation }) {
   }
 
   function setAppointments(time, timeString) {
+    console.log("working")
     setAppointmentsADMIN(time, timeString)
     setAppointment((old) => {
       return { ...old, Appointment: { time: time, timeString: timeString, date: selectedDate, price: 'free' } }
@@ -76,12 +61,22 @@ export default function AppointmentPage({ navigation }) {
 
   function setAppointmentsADMIN(time, timeString) {
     setAppointmentADMIN((old) => {
-      return { [selectedDate]: { [timeString]: { time: time, timeString: timeString, name: userData.Name, date: selectedDate, price: 'free', phone: userData.Phone } } }
+      return {
+        [selectedDate]: {
+          [timeString]: {
+            time: time,
+            timeString: timeString,
+            name: userData.Name,
+            date: selectedDate,
+            price: 'free',
+            phone: userData.Phone
+          }
+        }
+      }
     })
   }
 
 
-  const [selected, setselected] = useState()
   const mapTimes = availability?.time[selectedDay] ? Object.values(availability?.time[selectedDay]).map((item) => {
     const apttake = () => {
       let result = false
@@ -110,6 +105,8 @@ export default function AppointmentPage({ navigation }) {
     }
 
   }) : ''
+
+
 
   function bookApt() {
     setMarkedDates((old) => {
@@ -143,13 +140,13 @@ export default function AppointmentPage({ navigation }) {
     }))
 
     _markedDates()
+    fetchAppointments(setAppointmentData)
+    fetchAva(setAvailability)
     setOldDate(selectedDate)
   }, [selectedDate, tapped, isFocused])
 
   useEffect(() => {
     getSignedInUser(setSignedInUser, setUserData)
-    fetchAppointments(setAppointmentData)
-    fetchAva(setAvailability)
     if (appointmentData[selectedDate] != undefined) {
       setTakenApts(Object.keys(appointmentData[selectedDate]))
     } else {
@@ -159,8 +156,19 @@ export default function AppointmentPage({ navigation }) {
 
 
   return (
-    <Animated.View className={'flex-1 h-screen w-screen'} entering={ZoomInEasyDown} exiting={ZoomOutEasyDown}>
+    <Animated.View className={'flex-1 h-screen w-screen'} entering={FadeInUp} exiting={ZoomOutEasyDown}>
+      {!appointmentData && <View className="z-40 absolute h-screen bottom-0 top-0 flex w-full">
+        <ActivityIndicator size="large" className={'m-auto text-red-900'} color={'pink'} />
+      </View>}
       <SafeAreaView className={'flex flex-1 h-full'}>
+
+        <StripeProvider
+          publishableKey={STRIPE_API_KEY}
+          urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
+          merchantIdentifier="merchant.com.{{AHW}}" // required for Apple Pay
+        >
+          {booking && <Book date={selectedDate} time={newTakenApt} userData={userData} toggleBooking={toggleBooking} bookApt={bookApt} />}
+        </StripeProvider>
 
         <View className={'flex flex-row justify-between px-2'}>
           <LogoutButton navigation={navigation} />
@@ -191,7 +199,7 @@ export default function AppointmentPage({ navigation }) {
 
           }}
         />
-        <TouchableOpacity onPress={bookApt} className={'h-14 w-[70%] mx-auto mt-8  bg-blue-700 rounded-xl'}>
+        <TouchableOpacity disabled={!selected} onPress={toggleBooking} className={'h-14 w-[70%] mx-auto mt-8  bg-blue-700 rounded-xl'}>
           <Text className={'text-2xl font-bold text-center m-auto text-white'}>Book Now</Text>
         </TouchableOpacity>
 

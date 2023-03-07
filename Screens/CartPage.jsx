@@ -2,8 +2,8 @@ import {
   SafeAreaView,
   Text,
   View,
-  Image,
-  Pressable,
+  ActivityIndicator,
+  TouchableOpacity,
   ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -12,6 +12,12 @@ import Animated, {
   ZoomInEasyDown,
   FadeInUp,
   FadeOutDown,
+  SlideInDown,
+  SlideOutDown,
+  SlideInLeft,
+  SlideInRight,
+  SlideOutLeft,
+  FadeInDown,
 } from "react-native-reanimated";
 import CartItem from "../Componets/CartScreen/CartItem";
 import mocCart from "../BackenData/Carts";
@@ -24,6 +30,11 @@ import LogoutButton from "../Componets/Universal/LogoutButton";
 export default function CartPage({ navigation }) {
   const [signedInUser, setSignedInUser] = useState();
   const [userData, setUserData] = useState();
+  const isFocused = useIsFocused();
+  const [CARTTOTAL, setCARTTOTAL] = useState(userData?.CartTotal);
+  const [noCart, setNoCart] = useState(false);
+
+  const toggleNoCart = () => { setNoCart(!noCart) }
   const deleteCartItem = (name) => {
     deleteUserData(signedInUser, name);
   };
@@ -34,12 +45,13 @@ export default function CartPage({ navigation }) {
     navigate("ProductPage", { name: name, price: price, img: img, desc: desc });
   };
   const toCheckOut = () => {
-    navigate("CheckOutPage");
+    (CARTTOTAL > 0) ? navigate("CheckOutPage") : setNoCart(true)
   };
 
-  const isFocused = useIsFocused();
-  let [CARTTOTAL, setCARTTOTAL] = useState(userData?.CartTotal);
-  let [reRender, setReRender] = useState(false);
+
+  if (noCart) setTimeout(() => { toggleNoCart() }, 1000)
+
+
   const fetchData = () => {
     getSignedInUser(setSignedInUser, setUserData);
   };
@@ -68,7 +80,7 @@ export default function CartPage({ navigation }) {
 
   useEffect(() => {
     getSignedInUser(setSignedInUser, setUserData);
-  }, [reRender, isFocused, userData?.CartTotal]);
+  }, [isFocused, userData?.CartTotal]);
 
   if (CARTTOTAL != userData?.CartTotal) {
     getSignedInUser(setSignedInUser, setUserData);
@@ -78,10 +90,13 @@ export default function CartPage({ navigation }) {
   return (
     <Animated.View
       className={"flex-1 h-screen w-screen"}
-      entering={ZoomInEasyDown}
+      entering={FadeInDown}
       exiting={ZoomOutEasyDown}
     >
       <SafeAreaView className={"flex flex-1 h-full "}>
+        {!userData && <View className="z-40 absolute h-screen bottom-0 top-0 flex w-full">
+          <ActivityIndicator size="large" className={'m-auto text-red-900'} color={'pink'} />
+        </View>}
         {/*TOP BAR */}
         <View className={"flex flex-row justify-between mx-2"}>
           <LogoutButton navigation={navigation} />
@@ -104,14 +119,15 @@ export default function CartPage({ navigation }) {
           <Text className={"text-3xl font-semibold text-slate-600"}>Total</Text>
           <CartTotal CARTTOTAL={CARTTOTAL} />
         </View>
-        <Pressable
+        <TouchableOpacity
           onPress={toCheckOut}
-          className={"w-[55%] h-24 rounded-full p-2 bg-rose-300"}
+          className={"w-[55%] h-24 rounded-full justify-center p-2 bg-rose-300 relative flex-row flex"}
         >
+          {noCart && <Animated.Text entering={SlideInRight} exiting={SlideOutLeft} className={'absolute -top-8 font-semibold text-rose-900 text-xl'}>No itmes in cart</Animated.Text>}
           <Text className={"text-4xl font-bold m-auto text-white"}>
             Pay Now
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </Animated.View>
   );

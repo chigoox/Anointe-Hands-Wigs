@@ -134,6 +134,7 @@ function getZipInfo(zip, set) {
             return response.json();
         })
         .then(function (data) {
+            console.log(data)
             set(data)
         }, function (rejectionReason) { // 3
             //console.log('Error parsing JSON from response:', rejectionReason, responseClone); // 4

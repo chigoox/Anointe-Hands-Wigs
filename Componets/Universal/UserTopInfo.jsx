@@ -6,8 +6,8 @@ export default function UserTopInfo({ userData }) {
         <View className={'h-8'}>
             <Text className={'text-slate-600 text-center font-semibold'}>{userData?.Name ? userData?.Name : ''}</Text>
             <Text className={'text-slate-800 text-center text-xm'}>
-                {userData?.userDetails.city ? userData?.userDetails.city : ''},{' '}
-                {userData?.userDetails.state ? userData?.userDetails.state : ''}
+                {userData?.userDetails?.city ? userData?.userDetails?.city : ''},{' '}
+                {userData?.userDetails?.state ? userData?.userDetails?.state : ''}
             </Text>
         </View>
     )

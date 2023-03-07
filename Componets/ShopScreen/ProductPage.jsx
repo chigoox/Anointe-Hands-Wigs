@@ -1,10 +1,11 @@
 import { SafeAreaView, Text, View, Image, Pressable, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react'
-import Animated, { FadeInUp, FadeOutDown } from 'react-native-reanimated';
+import Animated, { FadeInUp, FadeOutDown, FadeOutUp } from 'react-native-reanimated';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { addUserInfoToDatabase, getSignedInUser, deleteUserData, decreaseCartAmount } from '../../MyCodes/ed5';
 import { increment } from "firebase/firestore";
 import UserProfileButton from '../Universal/UserProfileButton';
+import Notification from '../Universal/Notification';
 
 function ProductPage({ navigation, route }) {
     const [signedInUser, setSignedInUser] = useState()
@@ -15,7 +16,10 @@ function ProductPage({ navigation, route }) {
     const [addedToCart, setAddedToCart] = useState(inCart)
     const navigate = (to, params) => { navigation.navigate(to, params) }
     const toCheckOutBuyNow = (name, price, img, desc) => { navigate('CheckOutPage', { name: name ? name : '', price: price ? price : '', img: img ? img : 'img', desc: desc ? desc : '' }) }
-
+    const [notificationAddToCart, setNotficationAddToCart] = useState(false)
+    const [notificationRemoveCart, setNotficationRemoveCart] = useState(false)
+    const toggleNotifiRemove = () => { setNotficationRemoveCart(!notificationRemoveCart) }
+    const toggleNotifiAdd = () => { setNotficationAddToCart(!notificationAddToCart) }
 
 
 
@@ -36,12 +40,17 @@ function ProductPage({ navigation, route }) {
 
 
     function addToCart() {
-        addedToCart ? (
-            deleteUserData(signedInUser, name),
+        if (addedToCart) {
+            toggleNotifiRemove()
+            deleteUserData(signedInUser, name)
             decreaseCartAmount(signedInUser, price)
-        ) :
-            (addUserInfoToDatabase(toCart, signedInUser))
+        } else {
+            toggleNotifiAdd()
+            addUserInfoToDatabase(toCart, signedInUser)
+        }
+
         setAddedToCart(!addedToCart)
+
     }
 
 
@@ -54,6 +63,8 @@ function ProductPage({ navigation, route }) {
     return (
         <Animated.View nestedScrollEnabled={true} className={'flex-1 h-screen  w-screen bg-slate-50'} entering={FadeInUp} exiting={FadeOutDown} contentInsetAdjustmentBehavior="automatic">
             <SafeAreaView className={'flex flex-1 h-full'}>
+                {notificationAddToCart && <Notification text={'Added to cart'} color={false} toggleNotification={toggleNotifiAdd} />}
+                {notificationRemoveCart && <Notification text={'Removed from cart'} color={true} toggleNotification={toggleNotifiRemove} />}
                 {/* Nav bar */}
                 <View className={'absolute  w-full h-24 z-10 flex flex-row items-end justify-between px-4'}>
                     <TouchableOpacity onPress={() => { navigation.goBack() }}>
