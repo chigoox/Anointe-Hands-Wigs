@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import Animated, { FadeInUp, FadeOutRight } from 'react-native-reanimated';
 import { handleInput5, addUserInfoToDatabase, getZipInfo, getSignedInUser } from '../../MyCodes/ed5'
 import LoginError from '../HomeScreen/LoginError';
-import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 function PaymentInfoPage(props) {
@@ -32,7 +31,7 @@ function PaymentInfoPage(props) {
       }
 
     })
-    props.navigation.navigate('CheckOutPage', { cardComplete: inputData?.cardDetails?.complete ? inputData?.cardDetails?.complete : false })
+    props.navigation.navigate('CheckOutPage')
 
 
   }
@@ -95,38 +94,9 @@ function PaymentInfoPage(props) {
           />
 
           <View className={'border-4 border-white'}>
-            <View className={'rounded-xl  w-[80%] mx-auto'}>
-              <Text className={'text-white text-center text-3xl font-bold m-2'}>Payment</Text>
-              <Image className={'rounded-xl h-10 relative object-contain'} source={{ uri: 'https://basyspro.com/wp-content/uploads/2017/02/Credit-Card-Logos-1024x156.jpg' }} />
 
-            </View>
 
-            <CardField className={'border-black border'}
-              postalCodeEnabled={true}
-              placeholders={{
-                number: '4242 4242 4242 4242',
-              }}
-              cardStyle={{
-                backgroundColor: '#FFFFFF',
-                textColor: '#000000',
-                borderColor: 'black',
-                borderWidth: 1,
-                borderRadius: 8,
-              }}
-              style={{
-                width: '98%',
-                height: 50,
-                marginVertical: 5,
-                margin: 4
-              }}
-              onCardChange={(cardDetails) => {
 
-                setInputData((old) => { return { ...old, cardDetails: cardDetails } })
-              }}
-              onFocus={(focusedField) => {
-
-              }}
-            />
           </View>
           <View className={'mb-24'}>
             <Pressable onPress={submit} className={'block border-2 border-sky-400 h-16 w-1/2 m-auto rounded-full  my-2'}>

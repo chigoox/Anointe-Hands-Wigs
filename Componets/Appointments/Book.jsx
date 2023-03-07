@@ -6,7 +6,7 @@ import { StripeProvider, useConfirmPayment } from '@stripe/stripe-react-native';
 import sendMSG from '../../MyCodes/sendMSG';
 import Notification from '../Universal/Notification';
 
-const Book = ({ date, userData, toggleBooking, time }) => {
+const Book = ({ date, userData, toggleBooking, time, bookApt }) => {
     const [cardDetails, setCardDetails] = useState()
     const { confirmPayment, loading } = useConfirmPayment();
     const [payFailError, setPayFailError] = useState({})
@@ -52,7 +52,7 @@ const Book = ({ date, userData, toggleBooking, time }) => {
                      <p>You placed a new appointment on AWH!</p>
                      <h3>When: ${date} @ ${time} </h3>
                     `
-            console.log(userData.Email)
+            bookApt()
             sendMSG('+19082202312', userData.Email, `${htmlMSG}`, txt, `New Appointment at AHW`)
 
 

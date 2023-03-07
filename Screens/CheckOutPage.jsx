@@ -4,15 +4,16 @@ import Animated, { ZoomOutEasyDown, ZoomInEasyDown, FadeInUp, FadeOutDown, FadeI
 import { getSignedInUser, deleteUserCart, addUserInfoToDatabase, addAdminInfoToDatabase, fetchDocument } from '../MyCodes/ed5'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { STRIPE_API_KEY } from '@env'
-import { StripeProvider, useConfirmPayment } from '@stripe/stripe-react-native';
+import { CardField, StripeProvider, useConfirmPayment } from '@stripe/stripe-react-native';
 import Notification from '../Componets/Universal/Notification';
 import sendMSG from '../MyCodes/sendMSG';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
 
 const CheckOutPage = ({ navigation, route }) => {
 
-  const { name, price, img, desc, cardComplete } = route.params ? route.params : { name: undefined, price: undefined, img: undefined, desc: undefined, cardComplete: undefined }
+  const { name, price, img, desc } = route.params ? route.params : { name: undefined, price: undefined, img: undefined, desc: undefined, cardComplete: undefined }
   const [signedInUser, setSignedInUser] = useState()
   const [userData, setUserData] = useState()
   const [orderNumber, setOrderNumber] = useState()
@@ -23,6 +24,7 @@ const CheckOutPage = ({ navigation, route }) => {
   const _orderNumber = Number(orderNumber?.OrderNumber?.substring(5))
   const _newOrderNumber = `${orderNumber?.OrderNumber?.substring(0, 5)}${_orderNumber + 1}`
   const buyNowCart = { [name]: { desc: desc, img: img, price: price, name: name } }
+  const [cardComplete, setCardComplete] = useState()
 
 
 
@@ -171,72 +173,102 @@ const CheckOutPage = ({ navigation, route }) => {
 
 
   return (
-    <StripeProvider
-      publishableKey={STRIPE_API_KEY}
-      urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
-      merchantIdentifier="merchant.com.{{AHW}}" // required for Apple Pay
-    >
-      <Animated.View className={'flex-1 h-screen w-screen'} entering={SlideOutDown} exiting={ZoomOutEasyDown}>
-        <SafeAreaView className={'flex flex-1 h-full relative'}>
-          {notificationPaymentFailed && <Notification text={`${payFailError}`} color={true} toggleNotification={toggleNotifiFailed} />}
-          {loading && <View className="z-40 absolute h-screen bottom-0 top-0 flex w-full">
-            <ActivityIndicator size="large" className={'m-auto text-red-900'} color={'pink'} />
-          </View>}
-          {/*TOP BAR */}
-          <View className={'flex flex-row justify-between mx-2'}>
-            <TouchableOpacity onPress={() => { navigation.goBack() }}>
-              <View className={'bg-white h-12 w-12 rounded-full p-2'}>
-                <Ionicons name="caret-back-circle-outline" size={32} color={'pink'}></Ionicons>
+    <KeyboardAwareScrollView>
+      <StripeProvider
+        publishableKey={STRIPE_API_KEY}
+        urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
+        merchantIdentifier="merchant.com.{{AHW}}" // required for Apple Pay
+      >
+        <Animated.View className={'flex-1 h-screen w-screen'} entering={SlideOutDown} exiting={ZoomOutEasyDown}>
+          <SafeAreaView className={'flex flex-1 h-full relative'}>
+            {notificationPaymentFailed && <Notification text={`${payFailError}`} color={true} toggleNotification={toggleNotifiFailed} />}
+            {loading && <View className="z-40 absolute h-screen bottom-0 top-0 flex w-full">
+              <ActivityIndicator size="large" className={'m-auto text-red-900'} color={'pink'} />
+            </View>}
+            {/*TOP BAR */}
+            <View className={'flex flex-row justify-between mx-2'}>
+              <TouchableOpacity onPress={() => { navigation.goBack() }}>
+                <View className={'bg-white h-12 w-12 rounded-full p-2'}>
+                  <Ionicons name="caret-back-circle-outline" size={32} color={'pink'}></Ionicons>
+                </View>
+              </TouchableOpacity>
+              <View>
+                <Text className={'text-slate-800 text-center font-bold text-lg'}>Checkout</Text>
               </View>
-            </TouchableOpacity>
-            <View>
-              <Text className={'text-slate-800 text-center font-bold text-lg'}>Checkout</Text>
+              <View className={'h-10 w-10 rounded-full overflow-hidden'}>
+              </View>
             </View>
-            <View className={'h-10 w-10 rounded-full overflow-hidden'}>
+            {/* checkout Items */}
+            <View className={'p-6 shadow-black shadow-md'}>
+              {name ?
+                (<View className={'border-4 p-2 h-[40rem] border-slate-300'}>
+                  <BuyNowMap cartMap={cartMap} key={`${name} ${price}`} />
+                </View>)
+                :
+                (<View>
+                  <Text className={'text-3xl font-bold text-center m-2'}>Cart Items</Text>
+                  <ScrollView className={'border-4 p-2 border-slate-300'}>
+                    {cartMap}
+                  </ScrollView>
+                  <Text className={'text-3xl font-semibold text-slate-600'}>Total: {userData?.CartTotal}</Text>
+                </View>)
+              }
+
+            </View>
+
+          </SafeAreaView>
+          {/* Shipping Info */}
+          <View className={'h-40  bottom-4 w-full p-2'}>
+            <CardField className={'border-black border'}
+              postalCodeEnabled={true}
+              placeholders={{
+                number: '4242 4242 4242 4242',
+              }}
+              cardStyle={{
+                backgroundColor: '#FFFFFF',
+                textColor: '#000000',
+                borderColor: 'black',
+                borderWidth: 1,
+                borderRadius: 8,
+              }}
+              style={{
+                width: '98%',
+                height: 50,
+                marginVertical: 5,
+                margin: 4
+              }}
+              onCardChange={(cardDetails) => {
+                setCardComplete(cardDetails.complete)
+
+              }}
+              onFocus={(focusedField) => {
+
+              }}
+            />
+
+            <TouchableOpacity onPress={toPaymentInfoPage} disabled={loading} className={`${cardComplete ? 'bg-emerald-400' : 'bg-white'} h-16 w-[80%]  rounded-md m-auto shadow-sm shadow-black`} >
+              <Text className={'font-bold text-2xl text-center m-auto'}>Customer Info</Text>
+            </TouchableOpacity>
+
+          </View >
+          {/* CheckOut */}
+          <View className={'bottom-4 flex flex-row justify-between p-4'}>
+            <View className="flex flex-row w-full  m-auto justify-center">
+              {name && <TouchableOpacity onPress={() => { handlePay(true) }} disabled={true} className={`w-[45%] h-24 rounded-full p-2 m-2 ${cardComplete ? 'bg-emerald-400' : 'bg-rose-400'}`}>
+                <Text className={'text-4xl font-bold m-auto text-white'}>Pay Now</Text>
+              </TouchableOpacity>}
+
+              <TouchableOpacity onPress={() => { handlePay(false) }} disabled={loading} className={`${cardComplete ? 'bg-emerald-400' : 'bg-rose-400'} w-[45%] h-24 rounded-full p-2 m-2 `}>
+                <Text className={'text-4xl font-bold m-auto text-black'}>{name ? 'Buy All' : 'Buy'}</Text>
+              </TouchableOpacity>
             </View>
           </View>
-          {/* checkout Items */}
-          <View className={'p-6 shadow-black shadow-md'}>
-            {name ?
-              (<View className={'border-4 p-2 h-[40rem] border-slate-300'}>
-                <BuyNowMap cartMap={cartMap} key={`${name} ${price}`} />
-              </View>)
-              :
-              (<View>
-                <Text className={'text-3xl font-bold text-center m-2'}>Cart Items</Text>
-                <ScrollView className={'border-4 p-2 border-slate-300'}>
-                  {cartMap}
-                </ScrollView>
-                <Text className={'text-3xl font-semibold text-slate-600'}>Total: {userData?.CartTotal}</Text>
-              </View>)
-            }
-
-          </View>
-
-        </SafeAreaView>
-        {/* Shipping Info */}
-        <View className={'h-40  bottom-4 w-full p-2'}>
-          <TouchableOpacity onPress={toPaymentInfoPage} disabled={loading} className={`${cardComplete ? 'bg-emerald-400' : 'bg-white'} h-16 w-[80%]  rounded-md m-auto shadow-sm shadow-black`} >
-            <Text className={'font-bold text-2xl text-center m-auto'}>Shipping & Card Info</Text>
-          </TouchableOpacity>
-
-        </View >
-        {/* CheckOut */}
-        <View className={'bottom-4 flex flex-row justify-between p-4'}>
-          <View className="flex flex-row w-full  m-auto justify-center">
-            {name && <TouchableOpacity onPress={() => { handlePay(true) }} disabled={true} className={`w-[45%] h-24 rounded-full p-2 m-2 ${cardComplete ? 'bg-emerald-400' : 'bg-rose-400'}`}>
-              <Text className={'text-4xl font-bold m-auto text-white'}>Pay Now</Text>
-            </TouchableOpacity>}
-
-            <TouchableOpacity onPress={() => { handlePay(false) }} disabled={loading} className={`${cardComplete ? 'bg-emerald-400' : 'bg-rose-400'} w-[45%] h-24 rounded-full p-2 m-2 `}>
-              <Text className={'text-4xl font-bold m-auto text-black'}>{name ? 'Buy All' : 'Buy'}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
 
 
-      </Animated.View>
-    </StripeProvider>
+        </Animated.View>
+      </StripeProvider>
+    </KeyboardAwareScrollView>
+
   )
 }
 

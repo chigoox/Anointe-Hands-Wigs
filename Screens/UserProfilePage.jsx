@@ -94,7 +94,7 @@ function UserProfilePage({ navigation }) {
 
   return (
     <Animated.View
-      entering={FadeInUp}
+      entering={FadeIn}
       exiting={FadeOutRight}
       className={
         "absolute h-screen w-full z-20 bg-white transition-all duration-[20] ease-in-out"

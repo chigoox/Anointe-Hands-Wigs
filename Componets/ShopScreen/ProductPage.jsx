@@ -1,6 +1,6 @@
 import { SafeAreaView, Text, View, Image, Pressable, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react'
-import Animated, { FadeInUp, FadeOutDown, FadeOutUp } from 'react-native-reanimated';
+import Animated, { FadeInUp, FadeOutDown, FadeOutUp, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { addUserInfoToDatabase, getSignedInUser, deleteUserData, decreaseCartAmount } from '../../MyCodes/ed5';
 import { increment } from "firebase/firestore";
@@ -21,7 +21,9 @@ function ProductPage({ navigation, route }) {
     const toggleNotifiRemove = () => { setNotficationRemoveCart(!notificationRemoveCart) }
     const toggleNotifiAdd = () => { setNotficationAddToCart(!notificationAddToCart) }
 
-
+    const [noCart, setNoCart] = useState(false);
+    const toggleNoCart = () => { setNoCart(!noCart) }
+    if (noCart) setTimeout(() => { toggleNoCart() }, 1000)
 
     checkIfItemInCart()
     function checkIfItemInCart() {
@@ -74,7 +76,7 @@ function ProductPage({ navigation, route }) {
                     </TouchableOpacity>
 
                     <View className={'rounded-xl bg-slate-200 bg-opacity-75 flex justify-center'}>
-                        <UserProfileButton />
+                        <UserProfileButton navigation={navigation} />
                     </View>
                 </View>
                 {/* Product Img */}
@@ -92,9 +94,12 @@ function ProductPage({ navigation, route }) {
                     {/* bottom buttons */}
                     <View className={'flex flex-row justify-around w-screen self-end '}>
                         <TouchableOpacity
+
                             className={'bg-rose-400 h-22 w-[60%] rounded-full p-4'}
-                            onPress={() => { toCheckOutBuyNow(name, price, img, desc) }}
+                            onPress={() => { addedToCart ? toggleNoCart() : toCheckOutBuyNow(name, price, img, desc) }}
                         >
+                            {noCart && <Animated.Text entering={SlideInRight} exiting={SlideOutLeft} className={'absolute -top-8 font-semibold text-rose-900 text-xl'}>Item already in Cart</Animated.Text>}
+
                             <Text className={'font-bold text-5xl m-auto text-white'}>Buy Now</Text>
                         </TouchableOpacity>
                         <TouchableOpacity

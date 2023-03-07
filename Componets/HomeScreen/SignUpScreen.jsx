@@ -64,25 +64,25 @@ export default function SignUpScreen(props, { navigation }) {
 
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="h-[40%] w-full top-10 m-auto rounded-xl" >
             <TextInput className={'border-white text-white p-4 border-2  m-2 placeholder:text-white'}
-              onChangeText={(text) => { handleInput5('name', text, SETinputData) }}
+              onChangeText={(text) => { handleInput5('Name', text, SETinputData) }}
               placeholder={'Full name'}
               name={'Name'}
               autoComplete={'name'}
             />
             <TextInput className={'border-white text-white p-4 border-2  m-2'}
-              onChangeText={(text) => handleInput5('email', text, SETinputData)}
+              onChangeText={(text) => handleInput5('Email', text, SETinputData)}
               placeholder={'Email'}
               inputMode={'email'}
               autoComplete={'email'}
             />
             <TextInput className={'border-white text-white p-4 border-2  m-2'}
-              onChangeText={(text) => handleInput5('password', text, SETinputData)}
+              onChangeText={(text) => handleInput5('Password', text, SETinputData)}
               placeholder={'Password'}
               inputMode={'text'}
               secureTextEntry={'true'}
             />
             <TextInput className={'border-white text-white p-4 border-2  m-2'}
-              onChangeText={(text) => handleInput5('passwordMatch', text, SETinputData)}
+              onChangeText={(text) => handleInput5('PasswordMatch', text, SETinputData)}
               placeholder={'Confirm Password'}
               secureTextEntry={'true'}
               inputMode={'text'}

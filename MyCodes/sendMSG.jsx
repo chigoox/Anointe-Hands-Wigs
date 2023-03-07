@@ -1,7 +1,6 @@
 
 
 export default async function sendMSG(number, email, htmlMSG, txt, title) {
-    console.log('first')
     const end = 4
     const response = await fetch(`http://172.20.10.${end}:4242/sendSMS`, {
         method: 'POST',
