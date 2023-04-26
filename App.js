@@ -11,6 +11,7 @@ import {WelcomePage, AboutPage, ShopPage, CartPage, AppointmentPage, ProductPage
 
 
 
+
 const Tab = createBottomTabNavigator();
 function HomeScreen(){
 return(
@@ -29,7 +30,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="HomeScreen">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="WelcomePage">
         <Stack.Screen name="WelcomePage" component={WelcomePage} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="ProductPage" component={ProductPage} />
