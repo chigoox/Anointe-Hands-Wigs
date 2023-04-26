@@ -27,7 +27,7 @@ export default function WelcomePage({ navigation }) {
 
         {/* MainPage */}
         <View className={'w-[90%] h-[85%] m-auto flex items-start justify-center'}>
-          <View className={'flex p-4'}>
+          <View className={'flex p-4 z-0'}>
             <Text className={'text-white font-bold text-6xl'}>Anointed Hands Wigs</Text>
             <Text className="p-2 text-white text-xl">Let us cover you.</Text>
           </View>

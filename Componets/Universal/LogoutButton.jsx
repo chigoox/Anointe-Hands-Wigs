@@ -2,7 +2,6 @@ import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { getAuth, signOut } from "firebase/auth";
 import Animated, { FadeInLeft, FadeOutLeft } from 'react-native-reanimated';
-import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 
 
 export default function LogoutButton({ navigation }) {

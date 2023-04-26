@@ -4,10 +4,11 @@
       [
         "@stripe/stripe-react-native",
         {
-          "merchantIdentifier": "ed5",
+          "merchantIdentifier": ["merchant.ed5"],
           "enableGooglePay": true
         }
       ]
+      
     ],
     "name": "anointe-hands-wigs",
     "slug": "anointe-hands-wigs",
@@ -28,7 +29,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.chigoox.anointehandswigs"
+      "bundleIdentifier": "com.chigoox.anointehandswigs",
+      "buildNumber": "3"
     },
     "android": {
       "adaptiveIcon": {

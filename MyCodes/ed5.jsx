@@ -3,7 +3,6 @@ import { collection, arrayUnion, arrayRemove, increment, deleteDoc, doc, setDoc,
 import { AUTH, DATABASE, STORAGE } from '../config/Firebase';
 import React, { useEffect, useState } from 'react'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { TabRouter } from "@react-navigation/native";
 
 
 export function handleInput5(key, value, stateSetter) {

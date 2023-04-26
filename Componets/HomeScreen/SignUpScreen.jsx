@@ -56,7 +56,7 @@ export default function SignUpScreen(props, { navigation }) {
 
 
   return (
-    <Animated.View entering={FadeInUp} exiting={FadeOutRight} className={'absolute h-screen w-full z-20 bg-sky-300 transition-all duration-[20] ease-in-out'}>
+    <Animated.View entering={FadeInUp} exiting={FadeOutRight} className={'absolute h-screen w-full z-30 bg-sky-300 transition-all duration-[20] ease-in-out py-8'}>
       <KeyboardAwareScrollView >
         {error && <LoginError error={error} clear={clearError} />}
         <SafeAreaView className={'my-14 mx-2'}>
@@ -79,18 +79,19 @@ export default function SignUpScreen(props, { navigation }) {
               onChangeText={(text) => handleInput5('Password', text, SETinputData)}
               placeholder={'Password'}
               inputMode={'text'}
-              secureTextEntry={'true'}
+              secureTextEntry={true}
             />
             <TextInput className={'border-white text-white p-4 border-2  m-2'}
               onChangeText={(text) => handleInput5('PasswordMatch', text, SETinputData)}
               placeholder={'Confirm Password'}
-              secureTextEntry={'true'}
+              secureTextEntry={true}
               inputMode={'text'}
             />
-            <Pressable onPress={submit} className={'block border-2 border-sky-400 h-16 w-1/2 m-auto  mt-20'}>
+            <Pressable onPress={submit} className={'block border-2 border-sky-400 h-16 w-1/2 m-auto  mt-12'}>
               <Text className={'text-center font-bold text-white text-5xl p-3'}>Sign up</Text>
             </Pressable>
-            <Pressable onPress={props.toggleSignUp} className={'border-2 border-sky-400 h-10 w-36 m-auto  top-32 mt-2'}>
+            <View className='h-12'></View>
+            <Pressable onPress={props.toggleSignUp} className={'border-2 border-sky-400 h-10 w-36 m-auto  top-28 mt-2'}>
               <Text className={'text-center font-bold text-white text-2xl p-1'}>Back</Text>
             </Pressable>
           </KeyboardAvoidingView>
